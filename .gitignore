@@ -1,2 +1,7 @@
 # Claude Code agent worktrees
 .claude/worktrees/
+
+# Local secrets. The repo is public: never commit the TRMNL API key.
+.env
+.env.*
+!.env.example
