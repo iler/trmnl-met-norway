@@ -54,6 +54,49 @@ curl -H 'User-Agent: trmnl-met-norway/1.0 github.com/iler/trmnl-met-norway' \
 To see a failed poll, point one of the two URLs in `src/settings.yml` at a path
 that does not exist, then poll again.
 
+## Push to TRMNL
+
+`src/settings.yml` carries `id: 460164`. `trmnlp push` updates that plugin.
+**Without the id it creates a new plugin on every run**, so never remove it.
+
+```sh
+bin/push            # asks before it overwrites
+bin/push --force    # no prompt
+```
+
+`bin/push` reads `TRMNL_API_KEY` from the 1Password Environment mounted at
+`./.env`, and hands it to Docker **by name, not by value**. Do not write
+`-e TRMNL_API_KEY=<the key>` by hand: that puts the secret in your shell
+history and in the process list for everyone on the machine.
+
+Lint first. It needs no key, so it costs nothing:
+
+```sh
+docker run --rm -v "$PWD:/plugin" trmnl/trmnlp lint
+```
+
+### After publication, a push is a production change
+
+Today the plugin is private and a bad push costs nothing. Once the Recipe is
+published, the Recipe Master is live for every installed user, and its own
+generated screen is the public preview. At that point `bin/push --force` is a
+deploy, not a save. Lint, preview locally, and look at the screen before you
+run it.
+
+## The API key, and who can hold one
+
+The key is **per account, not per plugin**. It reads and writes every private
+plugin on the account. There is no narrower key to hand out, so:
+
+- A second person cannot be given a push key scoped to this plugin. Either the
+  account owner does the pushes, or that person is given the account key, which
+  gives them every plugin on it.
+- The way to share the *process* is this file plus `.env.example`, never the
+  value. Someone with their own TRMNL account runs `trmnlp login`, or mounts
+  their own 1Password Environment with their own key.
+- Agents must not read `./.env`. It is a named pipe that streams the real
+  secrets; the repo installs the 1Password validator hook to catch misuse.
+
 ## Traps found the hard way
 
 - `{% endtemplate %}` must be written exactly like that. The `trmnl-liquid` tag

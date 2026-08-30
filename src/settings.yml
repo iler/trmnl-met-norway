@@ -1,4 +1,7 @@
 ---
+# The plugin this repo pushes to. Without it, `trmnlp push` creates a new
+# plugin on every run instead of updating this one.
+id: 460164
 name: Forecast and Warnings
 strategy: polling
 refresh_interval: 60
