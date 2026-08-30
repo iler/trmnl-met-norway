@@ -75,6 +75,11 @@ Lint first. It needs no key, so it costs nothing:
 docker run --rm -v "$PWD:/plugin" trmnl/trmnlp lint
 ```
 
+`.github/workflows/trmnl.yml` runs the same lint on every pull request and on
+`main`. It has no push job on purpose: lint needs no key, so the gate costs no
+exposure, while a push job would put the account key where every action in the
+workflow can read it.
+
 ### After publication, a push is a production change
 
 Today the plugin is private and a bad push costs nothing. Once the Recipe is
