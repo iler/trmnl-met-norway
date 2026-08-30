@@ -167,3 +167,43 @@
   {%- endif -%}
 {%- endif -%}
 {%- assign day_list = days | split: ";" -%}
+
+{%- comment -%} 7. The next 12 hours, in 2-hour steps. Packed as
+     "epoch|temperature|symbol|precipitation|unit", joined with ";", the same
+     shape as the day list.
+
+     The unit is the exact text that follows the number, its own spacing
+     included: "%" for a probability, " mm" for an amount. MET gives the
+     probability in the Nordic area only, so both the choice and the way it is
+     written belong here, with the payload, and not in a layout. When the
+     language table of #16 arrives, this is the line it replaces.
+
+     Every read of the MET payload lives in this file. A layout names
+     now_*, warn_*, hour_list and day_list, never a MET field. {%- endcomment -%}
+{%- assign hours = "" -%}
+{%- if forecast_ok -%}
+  {%- for column in (1..6) -%}
+    {%- assign index = column | times: 2 -%}
+    {%- assign step = series[index] -%}
+    {%- if step == nil -%}{%- continue -%}{%- endif -%}
+    {%- assign epoch = step.time | date: "%s" | plus: tz -%}
+    {%- assign temperature = step.data.instant.details.air_temperature | round: 0 -%}
+    {%- assign symbol = step.data.next_1_hours.summary.symbol_code -%}
+    {%- if symbol == nil -%}
+      {%- assign symbol = step.data.next_6_hours.summary.symbol_code -%}
+    {%- endif -%}
+    {%- assign chance = step.data.next_1_hours.details.probability_of_precipitation -%}
+    {%- assign amount = step.data.next_1_hours.details.precipitation_amount -%}
+    {%- assign rain = "" -%}
+    {%- assign unit = "" -%}
+    {%- if chance -%}
+      {%- assign rain = chance | round: 0 -%}
+      {%- assign unit = "%" -%}
+    {%- elsif amount -%}
+      {%- assign rain = amount | round: 1 -%}
+      {%- assign unit = " mm" -%}
+    {%- endif -%}
+    {%- capture hours -%}{{ hours }}{{ epoch }}|{{ temperature }}|{{ symbol }}|{{ rain }}|{{ unit }};{%- endcapture -%}
+  {%- endfor -%}
+{%- endif -%}
+{%- assign hour_list = hours | split: ";" -%}

@@ -29,6 +29,11 @@ _Avoid_: public plugin, marketplace plugin
 **Chef**:
 TRMNL's automated linter. It checks a Recipe before a person reviews it.
 
+**Transform**:
+An optional script TRMNL runs on a polled response, inside TRMNL, before Liquid
+sees it. Not a server of ours. We do not use one; see ADR-0002.
+_Avoid_: proxy, preprocessor, serverless function
+
 **Polling**:
 The strategy where TRMNL's servers fetch a URL for us at a fixed interval. The
 other strategy is a webhook, which we do not use.

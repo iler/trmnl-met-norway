@@ -43,23 +43,13 @@
     {%- comment -%} Next 12 hours, in 2-hour steps. {%- endcomment -%}
     <div class="divider"></div>
     <div class="grid grid--cols-6">
-      {% for column in (1..6) %}
-        {% assign index = column | times: 2 %}
-        {% assign step = series[index] %}
+      {% for record in hour_list %}
+        {% assign hour = record | split: "|" %}
         <div class="flex flex--col flex--center-x gap--none">
-          <span class="label label--small">{{ step.time | date: "%s" | plus: tz | date: "%H" }}</span>
-          {% render "weather_icon", code: step.data.next_1_hours.summary.symbol_code, box: "w--[44px] h--[44px]" %}
-          <span class="value value--small value--tnums">{{ step.data.instant.details.air_temperature | round: 0 }}&deg;</span>
-          {%- comment -%} MET gives probability in the Nordic area only. Outside it,
-               fall back to millimetres, so the row is never blank. {%- endcomment -%}
-          {% assign chance = step.data.next_1_hours.details.probability_of_precipitation %}
-          {% assign amount = step.data.next_1_hours.details.precipitation_amount %}
-          <span class="label label--xsmall">
-            {%- if chance -%}{{ chance | round: 0 }}%
-            {%- elsif amount -%}{{ amount | round: 1 }} mm
-            {%- else -%}&nbsp;
-            {%- endif -%}
-          </span>
+          <span class="label label--small">{{ hour[0] | times: 1 | date: "%H" }}</span>
+          {% render "weather_icon", code: hour[2], box: "w--[44px] h--[44px]" %}
+          <span class="value value--small value--tnums">{{ hour[1] }}&deg;</span>
+          <span class="label label--xsmall">{% if hour[3] %}{{ hour[3] }}{{ hour[4] }}{% else %}&nbsp;{% endif %}</span>
         </div>
       {% endfor %}
     </div>
