@@ -1,0 +1,24 @@
+# Local dev server config for trmnlp. Not uploaded to TRMNL.
+#
+# To preview another place, edit the three custom fields and the time zone.
+# Do not use {{ env.X }} here: trmnlp interpolates it into the polling URL but
+# hands the templates the raw string, so the screen shows the Liquid instead of
+# the value.
+---
+watch:
+  - .trmnlp.yml
+  - src
+
+# The demo location of the Recipe Master. Its screen becomes the public preview,
+# so it must never be a home address.
+custom_fields:
+  latitude: '60.1699'
+  longitude: '24.9384'
+  location_name: Helsinki
+
+time_zone: Europe/Helsinki
+
+variables:
+  trmnl:
+    plugin_settings:
+      instance_name: Helsinki

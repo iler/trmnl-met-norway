@@ -1,0 +1,45 @@
+---
+# The plugin this repo pushes to. Without it, `trmnlp push` creates a new
+# plugin on every run instead of updating this one.
+id: 460164
+name: Forecast and Warnings
+strategy: polling
+refresh_interval: 60
+polling_verb: get
+polling_url: |-
+  https://api.met.no/weatherapi/locationforecast/2.0/complete?lat={{ latitude }}&lon={{ longitude }}
+  https://api.met.no/weatherapi/metalerts/2.0/current.json?lat={{ latitude }}&lon={{ longitude }}&lang=en
+polling_headers: 'user-agent=trmnl-met-norway/1.0%20github.com/iler/trmnl-met-norway'
+polling_body: ''
+no_screen_padding: 'no'
+dark_mode: 'no'
+framework_version: 3.3.0
+custom_fields:
+  - keyname: about
+    field_type: author_bio
+    name: About This Plugin
+    description: >-
+      Data from MET Norway, licensed CC BY 4.0. Not an official MET Norway
+      plugin. Warnings where MET issues them (Norway).
+    github_url: https://github.com/iler/trmnl-met-norway
+    learn_more_url: https://api.met.no/
+  - keyname: latitude
+    field_type: string
+    name: Latitude
+    description: Latitude of the place, with 4 decimals at most.
+    placeholder: '60.1699'
+    help_text: MET Norway rejects 5 or more decimals with a 403 error.
+    required: true
+  - keyname: longitude
+    field_type: string
+    name: Longitude
+    description: Longitude of the place, with 4 decimals at most.
+    placeholder: '24.9384'
+    help_text: MET Norway rejects 5 or more decimals with a 403 error.
+    required: true
+  - keyname: location_name
+    field_type: string
+    name: Location name
+    description: Shown on the screen. The forecast gives no place name.
+    placeholder: Helsinki
+    optional: true

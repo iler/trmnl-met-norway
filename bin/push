@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Push src/ to the TRMNL plugin named by `id` in src/settings.yml.
+#
+# The key comes from the 1Password Environment mounted at ./.env. It is passed
+# to Docker by name, not by value, so it never reaches the shell history or the
+# process list.
+#
+#   bin/push            # interactive, asks before it overwrites
+#   bin/push --force    # no prompt; see the warning in docs/development.md
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+if [ ! -e .env ]; then
+  echo "bin/push: no .env mount at $PWD/.env." >&2
+  echo "Mount the 1Password Environment first. See docs/development.md." >&2
+  exit 1
+fi
+
+set -a
+# shellcheck source=/dev/null
+. ./.env
+set +a
+
+if [ -z "${TRMNL_API_KEY:-}" ]; then
+  echo "bin/push: TRMNL_API_KEY is not in the mounted .env." >&2
+  echo "Add it to the 1Password Environment. See .env.example." >&2
+  exit 1
+fi
+
+tty_flag=()
+[ -t 0 ] && tty_flag=(-it)
+
+exec docker run --rm "${tty_flag[@]}" \
+  -e TRMNL_API_KEY \
+  -v "$PWD:/plugin" \
+  trmnl/trmnlp push "$@"

@@ -1,0 +1,86 @@
+{%- comment -%}
+  Full layout, 800x480. Top to bottom: warning band (only when MET issues one),
+  hero, 12-hour strip in 2-hour steps, five-day band, footer.
+{%- endcomment -%}
+
+{% if forecast_ok == false %}
+  <div class="layout layout--col layout--center">
+    <span class="value value--large">No forecast data</span>
+    <span class="label">MET Norway did not answer the last poll</span>
+  </div>
+{% else %}
+  <div class="layout layout--col gap--space-between">
+
+    {%- comment -%} Warning band. Severity is a word, because the screen has no colour. {%- endcomment -%}
+    {% if warn_count > 0 %}
+      <div class="flex flex--row flex--center-y gap bg--black px--2 py--1">
+        <span class="title title--small text--white text--uppercase">&#9888; {{ warn_level }}</span>
+        <span class="label label--small text--white">{{ warn_event }} &middot; {{ warn_area }}</span>
+        {% if warn_count > 1 %}
+          <div class="grow"></div>
+          <span class="label label--small text--white">+{{ warn_count | minus: 1 }} more</span>
+        {% endif %}
+      </div>
+    {% elsif warnings_ok == false %}
+      <div class="flex flex--row flex--center-y gap px--2">
+        <span class="label label--small label--outline">Warnings unavailable</span>
+      </div>
+    {% endif %}
+
+    {%- comment -%} Hero. {%- endcomment -%}
+    <div class="flex flex--row flex--center-y gap--large">
+      {% render "weather_icon", code: now_symbol, box: "w--[104px] h--[104px]" %}
+      <div class="flex flex--col gap--none">
+        <span class="value value--xxlarge value--tnums" data-fit-value="true">{{ now_temp | round: 0 }}&deg;</span>
+        <span class="label">Feels like {{ now_feels | round: 0 }}&deg; &middot; {{ now_wind | round: 0 }} m/s {{ now_dir }}</span>
+      </div>
+      <div class="grow"></div>
+      <div class="flex flex--col gap--none text--right w--[200px] no-shrink">
+        <span class="title title--medium" data-clamp="1">{{ place | default: "Forecast" }}</span>
+      </div>
+    </div>
+
+    {%- comment -%} Next 12 hours, in 2-hour steps. {%- endcomment -%}
+    <div class="divider"></div>
+    <div class="grid grid--cols-6">
+      {% for column in (1..6) %}
+        {% assign index = column | times: 2 %}
+        {% assign step = series[index] %}
+        <div class="flex flex--col flex--center-x gap--none">
+          <span class="label label--small">{{ step.time | date: "%s" | plus: tz | date: "%H" }}</span>
+          {% render "weather_icon", code: step.data.next_1_hours.summary.symbol_code, box: "w--[44px] h--[44px]" %}
+          <span class="value value--small value--tnums">{{ step.data.instant.details.air_temperature | round: 0 }}&deg;</span>
+          {%- comment -%} MET gives probability in the Nordic area only. Outside it,
+               fall back to millimetres, so the row is never blank. {%- endcomment -%}
+          {% assign chance = step.data.next_1_hours.details.probability_of_precipitation %}
+          {% assign amount = step.data.next_1_hours.details.precipitation_amount %}
+          <span class="label label--xsmall">
+            {%- if chance -%}{{ chance | round: 0 }}%
+            {%- elsif amount -%}{{ amount | round: 1 }} mm
+            {%- else -%}&nbsp;
+            {%- endif -%}
+          </span>
+        </div>
+      {% endfor %}
+    </div>
+
+    {%- comment -%} The next five days. {%- endcomment -%}
+    <div class="divider"></div>
+    <div class="grid grid--cols-5">
+      {% for record in day_list limit: 5 %}
+        {% assign day = record | split: "|" %}
+        <div class="flex flex--col flex--center-x gap--none">
+          <span class="label label--small text--uppercase">{% if forloop.first %}Today{% else %}{{ day[0] | times: 1 | date: "%a" }}{% endif %}</span>
+          {% render "weather_icon", code: day[3], box: "w--[40px] h--[40px]" %}
+          <span class="value value--small value--tnums">{{ day[1] | round: 0 }}&deg; / {{ day[2] | round: 0 }}&deg;</span>
+        </div>
+      {% endfor %}
+    </div>
+
+  </div>
+{% endif %}
+
+<div class="title_bar">
+  <span class="title">Forecast and Warnings</span>
+  <span class="instance">MET Norway &middot; CC BY 4.0 &middot; {{ updated | date: "%H:%M" }}</span>
+</div>

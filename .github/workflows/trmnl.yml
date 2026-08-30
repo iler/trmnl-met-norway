@@ -1,0 +1,31 @@
+# Lints the recipe on every pull request and on main.
+#
+# There is deliberately no push job. `trmnlp push` needs TRMNL_API_KEY, which
+# is an account key: it reads and writes every private plugin on the account,
+# and every action in a workflow can read a secret it is given. Lint needs no
+# key at all, so the gate that catches problems costs no exposure.
+#
+# Push stays local, through `bin/push`. When the Recipe is published, add a
+# push job triggered by workflow_dispatch or a GitHub Environment with a
+# required reviewer — not by a merge to main. After publication, a push is
+# live for every installed user. See docs/development.md.
+name: TRMNL
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ruby/setup-ruby@95ef2b042f9d7a56d8268cba8559e2842e2ad01b # v1.321.0
+        with:
+          ruby-version: "4.0"
+      - run: gem install trmnl_preview
+      - run: trmnlp lint
