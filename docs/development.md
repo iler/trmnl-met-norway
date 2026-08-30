@@ -41,6 +41,7 @@ Places that were useful while building:
 |---|---|---|---|
 | Helsinki | 60.1699 | 24.9384 | the calm case, and the demo location of the master |
 | Hammerfest | 70.6634 | 23.6821 | a Norwegian point that often carries a warning |
+| Greenland Sea | 78.5000 | -15.0000 | a marine warning area, and a point with no precipitation probability |
 
 Warnings move. To find a point that has one now:
 
@@ -61,3 +62,7 @@ that does not exist, then poll again.
 - `{% render %}` takes comma-separated arguments:
   `{% render "weather_icon", code: x, box: "..." %}`.
 - `{% render %}` gets an isolated scope. Everything it needs must be an argument.
+- `probability_of_precipitation` is a Nordic-area value. It was absent at every
+  one of the 62 time steps of the Greenland Sea point, where `precipitation_amount`
+  was still there. Any value from `/complete` needs a check before it is trusted
+  worldwide.

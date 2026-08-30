@@ -115,7 +115,6 @@
   {%- assign point = now.data.instant.details.wind_from_direction | round: 0 | plus: 22 | divided_by: 45 | modulo: 8 -%}
   {%- assign now_dir = compass[point] -%}
   {%- assign updated = IDX_0.properties.meta.updated_at | date: "%s" | plus: tz -%}
-  {%- assign today = now.time | date: "%s" | plus: tz | date: "%Y-%m-%d" -%}
 {%- endif -%}
 
 {%- comment -%} 6. Days. One pass over the series, because the array filters cannot
@@ -135,7 +134,6 @@
     {%- if block.details.air_temperature_max == nil -%}{%- continue -%}{%- endif -%}
     {%- assign local = step.time | date: "%s" | plus: tz -%}
     {%- assign key = local | date: "%Y-%m-%d" -%}
-    {%- if key == today -%}{%- continue -%}{%- endif -%}
     {%- if key != day_key -%}
       {%- if day_key != "" -%}
         {%- capture days -%}{{ days }}{{ day_epoch }}|{{ day_max }}|{{ day_min }}|{{ day_symbol }};{%- endcapture -%}

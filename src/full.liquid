@@ -31,13 +31,12 @@
     <div class="flex flex--row flex--center-y gap--large">
       {% render "weather_icon", code: now_symbol, box: "w--[104px] h--[104px]" %}
       <div class="flex flex--col gap--none">
-        <span class="value value--xxxlarge value--tnums" data-fit-value="true">{{ now_temp | round: 0 }}&deg;</span>
+        <span class="value value--xxlarge value--tnums" data-fit-value="true">{{ now_temp | round: 0 }}&deg;</span>
         <span class="label">Feels like {{ now_feels | round: 0 }}&deg; &middot; {{ now_wind | round: 0 }} m/s {{ now_dir }}</span>
       </div>
       <div class="grow"></div>
       <div class="flex flex--col gap--none text--right w--[200px] no-shrink">
         <span class="title title--medium" data-clamp="1">{{ place | default: "Forecast" }}</span>
-        <span class="label label--small">{{ updated | date: "%a %-d %b, %H:%M" }}</span>
       </div>
     </div>
 
@@ -51,8 +50,16 @@
           <span class="label label--small">{{ step.time | date: "%s" | plus: tz | date: "%H" }}</span>
           {% render "weather_icon", code: step.data.next_1_hours.summary.symbol_code, box: "w--[44px] h--[44px]" %}
           <span class="value value--small value--tnums">{{ step.data.instant.details.air_temperature | round: 0 }}&deg;</span>
-          {% assign rain = step.data.next_1_hours.details.precipitation_amount %}
-          <span class="label label--xsmall">{% if rain > 0 %}{{ rain }} mm{% else %}&nbsp;{% endif %}</span>
+          {%- comment -%} MET gives probability in the Nordic area only. Outside it,
+               fall back to millimetres, so the row is never blank. {%- endcomment -%}
+          {% assign chance = step.data.next_1_hours.details.probability_of_precipitation %}
+          {% assign amount = step.data.next_1_hours.details.precipitation_amount %}
+          <span class="label label--xsmall">
+            {%- if chance -%}{{ chance | round: 0 }}%
+            {%- elsif amount -%}{{ amount | round: 1 }} mm
+            {%- else -%}&nbsp;
+            {%- endif -%}
+          </span>
         </div>
       {% endfor %}
     </div>
@@ -63,7 +70,7 @@
       {% for record in day_list limit: 5 %}
         {% assign day = record | split: "|" %}
         <div class="flex flex--col flex--center-x gap--none">
-          <span class="label label--small text--uppercase">{{ day[0] | times: 1 | date: "%a" }}</span>
+          <span class="label label--small text--uppercase">{% if forloop.first %}Today{% else %}{{ day[0] | times: 1 | date: "%a" }}{% endif %}</span>
           {% render "weather_icon", code: day[3], box: "w--[40px] h--[40px]" %}
           <span class="value value--small value--tnums">{{ day[1] | round: 0 }}&deg; / {{ day[2] | round: 0 }}&deg;</span>
         </div>
@@ -75,5 +82,5 @@
 
 <div class="title_bar">
   <span class="title">Forecast and Warnings</span>
-  <span class="instance">MET Norway &middot; CC BY 4.0</span>
+  <span class="instance">MET Norway &middot; CC BY 4.0 &middot; {{ updated | date: "%H:%M" }}</span>
 </div>
