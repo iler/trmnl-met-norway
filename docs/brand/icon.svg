@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Plugin icon: a forecast that carries warnings.
+
+  The cloud is drawn from primitives rather than taken from the wi-* set the
+  markup uses. Two reasons: the wi glyphs are outlines and thin to a scribble
+  below about 32px, and keeping the mark free of SIL OFL artwork leaves the
+  icon wholly MIT, like the rest of this repo.
+
+  It carries no Yr, NRK or MET Norway reference, which the MET terms require.
+-->
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="512" height="512" viewBox="0 0 100 100"
+     role="img" aria-label="Cloud with a severe weather warning">
+
+  <rect width="100" height="100" fill="#fff"/>
+
+  <!-- Solid cloud silhouette: keeps its mass at any size. -->
+  <g transform="translate(2,2) scale(0.86)" fill="#000">
+    <circle cx="34" cy="42" r="18"/>
+    <circle cx="58" cy="34" r="24"/>
+    <circle cx="76" cy="48" r="16"/>
+    <rect x="30" y="44" width="50" height="20" rx="10"/>
+  </g>
+
+  <!-- The badge sits in a white cut-out so it never merges with the cloud. The
+       halo is kept tight: a wider one bites so deep that the cloud reads as a
+       crescent at large sizes. -->
+  <circle cx="68" cy="70" r="23" fill="#fff"/>
+  <g transform="translate(68,70) scale(0.40)">
+    <path d="M0,-46 L46,38 A9,9 0 0 1 38,50 L-38,50 A9,9 0 0 1 -46,38 Z" fill="#000"/>
+    <rect x="-5.5" y="-22" width="11" height="34" rx="5" fill="#fff"/>
+    <circle cx="0" cy="30" r="6.5" fill="#fff"/>
+  </g>
+</svg>

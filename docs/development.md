@@ -160,6 +160,46 @@ generated screen is the public preview. At that point `bin/push --force` is a
 deploy, not a save. Lint, preview locally, and look at the screen before you
 run it.
 
+## Brand assets
+
+`docs/brand/` holds the plugin icon: `icon.svg` is the source, `icon-512.png`
+is the export TRMNL's settings view takes.
+
+```sh
+magick docs/brand/icon.svg -background white -alpha remove -resize 512x512 \
+  -colorspace sRGB -type TrueColor -depth 8 -strip docs/brand/icon-512.png
+```
+
+**This is a manual sync point.** `bin/push` does not carry the icon: it is not
+one of `settings.yml`'s fields, and TRMNL takes it through the settings view
+only. The repo holds the source so the mark can be recut or restored; the
+served copy lives in TRMNL and has to be uploaded by hand.
+
+The mark is drawn from primitives on purpose. The `wi-*` glyphs the markup uses
+are outlines that thin to a scribble below about 32px, and they are SIL OFL 1.1;
+keeping them out of the icon leaves it wholly MIT. It carries no Yr, NRK or MET
+Norway reference, which the MET terms require.
+
+## The featured image is not a file
+
+Nothing to design or upload. TRMNL captures it from the plugin's **current
+generated screen**: "edit your recipe settings, and there will be a button to
+set the preview image as the current screens image." So the work is to make the
+screen worth capturing, then press the button.
+
+Keep the Recipe Master out of every playlist. A full-view plugin in no playlist
+does not have its screen refreshed, which is what freezes the install page
+preview.
+
+The screen worth capturing is one with a warning band, because the warnings are
+what this recipe adds. That needs a real warning live at a real coordinate at
+capture time: point the master at it, let it refresh, capture, then set the
+fields back to the demo location. The stored image keeps the warning.
+
+**Never capture a screen built from a `.trmnlp.yml` fixture.** The fixtures
+exist to test paths the weather will not produce on demand. A fixture screen
+presented as a marketplace preview is a fabricated product shot.
+
 ## The API key, and who can hold one
 
 The key is **per account, not per plugin**. It reads and writes every private
