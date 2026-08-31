@@ -21,7 +21,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-: "${TRMNL_API_KEY_REF:=op://Private/TRMNL/credential}"
+: "${TRMNL_API_KEY_REF:=op://TRMNL/API/credential}"
 
 if [ -z "${TRMNL_API_KEY:-}" ]; then
   if ! command -v op >/dev/null 2>&1; then
@@ -29,10 +29,17 @@ if [ -z "${TRMNL_API_KEY:-}" ]; then
     echo "Install op, or export TRMNL_API_KEY for this command only." >&2
     exit 1
   fi
-  if ! TRMNL_API_KEY="$(op read "$TRMNL_API_KEY_REF" 2>/dev/null)" || [ -z "$TRMNL_API_KEY" ]; then
+  op_error="$(mktemp)"
+  trap 'rm -f "$op_error"' EXIT
+  if ! TRMNL_API_KEY="$(op read "$TRMNL_API_KEY_REF" 2>"$op_error")" || [ -z "$TRMNL_API_KEY" ]; then
     echo "bin/push: could not read the TRMNL account key from 1Password." >&2
     echo "  reference: $TRMNL_API_KEY_REF" >&2
-    echo "Point TRMNL_API_KEY_REF at the item that holds it. See docs/development.md." >&2
+    # op's own words, because the cause is often not the reference. A coding
+    # agent's sandbox, for one, cannot read ~/.config/op, so this must be run
+    # from your own terminal.
+    if [ -s "$op_error" ]; then
+      sed 's/^/  op: /' "$op_error" >&2
+    fi
     exit 1
   fi
   export TRMNL_API_KEY

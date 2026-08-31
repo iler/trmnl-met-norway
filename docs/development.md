@@ -121,6 +121,11 @@ bin/push            # asks before it overwrites
 bin/push --force    # no prompt
 ```
 
+**Run it from your own terminal.** A coding agent's sandbox cannot read
+`~/.config/op`, so `op read` fails there with `operation not permitted`, and no
+push happens. In Claude Code, type `! bin/push` so the output lands in the
+conversation.
+
 `bin/push` takes the key from the first source that has it:
 
 1. `TRMNL_API_KEY` already in the environment — GitHub Actions, or an export.
