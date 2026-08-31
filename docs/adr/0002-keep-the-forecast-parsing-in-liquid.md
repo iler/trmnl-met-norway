@@ -23,8 +23,27 @@ returns about 89 kB with extra fields per step; the rest of the world gets about
 returned a byte-identical 89,118 with the same `Last-Modified`. The 93,211 was a
 different model run of the same point.
 
-**The worst case is 89.6 kB, and it is stable.** The margin against the cap is
-about 10 per cent, and it is fixed, not shrinking.
+**The two populations are real. "Stable" was too strong**, and this document
+said it on one day of data — the same mistake, in the other direction, as the
+growth claim it was written to correct.
+
+Measured again on 2026-08-31, at four Nordic points:
+
+| Point | 2026-08-30 | 2026-08-31 |
+|---|---|---|
+| Oslo | 89,551 | 92,273 |
+| Helsinki | 89,118 | 91,966 |
+| Tromsø | 88,521 | 90,947 |
+| Trondheim | — | 91,937 |
+
+This is still not evidence of growth: two rounds is not a trend, and Helsinki
+alone ranged 89,118 to 93,211 inside one day. What it does show is that the
+payload **moves by about 4 kB between model runs**, so no single sample
+describes it.
+
+**The number that matters is the observed peak: 93,211 bytes**, Helsinki,
+2026-08-30. That is 93.2 per cent of the cap, so the margin is **under 7 per
+cent**, not the 10 this document first claimed.
 
 ## Decision
 
@@ -51,9 +70,12 @@ only array-of-records Liquid offers.
 
 ## Consequences
 
-- The 100 kB cap becomes a **watch item, not a driver**. The number to compare
-  against is **89,551 bytes**, MET Norway `/complete`, Oslo, 2026-08-30. Measure
-  the Nordic worst case again before publication and after any MET model change.
+- The 100 kB cap becomes a **watch item, not a driver**. Watch the **peak, not a
+  sample**: the highest yet seen is **93,211 bytes**, MET Norway `/complete`,
+  Helsinki, 2026-08-30, leaving under 7 per cent. Take several Nordic points on
+  several days before publication and after any MET model change, and compare
+  the highest reading, because one reading understates the payload by up to
+  4 kB.
   The Nordic area is where the margin is thinnest and also where the warnings
   are, so a MET field addition would hit our own users first.
 - Because the layouts read only derived values, adopting a transform later is a
@@ -73,7 +95,9 @@ the article announcing the transform runtime as the answer to large payloads,
 which only makes sense if the cap is measured *after* the transform. The
 developer docs and the private-plugins page say nothing. It is also unknown
 whether the cap counts each polling URL or the combined `IDX_*` payload, and
-whether it counts raw or compressed bytes; MET gzips 89,551 bytes to 7,032.
+whether it counts raw or compressed bytes; MET gzips 89,551 bytes to 7,032, a
+ratio of nearly 13 to 1. If the cap counts what arrives on the wire, none of
+this matters at all.
 
 If the cap is measured on the incoming response, **a transform cannot help with
 it at all**, and the only lever is `/compact`. This decision does not depend on
