@@ -1,0 +1,51 @@
+{%- comment -%}
+  Quadrant, 400x240: a postcard, about 144px of content height. One thing only.
+
+  Which one thing depends on the weather. This plugin exists to carry MET's
+  warnings (ADR-0001), so when a warning is issued the warning IS the screen and
+  the forecast steps aside. Otherwise the screen is the current conditions.
+  This is the only layout where the warning replaces the forecast rather than
+  shrinking it, because it is the only one with no room to do both.
+
+  No title bar: #9 puts the CC BY credit on the full screen and both halves,
+  and leaves the quadrant to carry it in the author bio. That buys back the
+  height the one thing needs.
+
+  A failed warnings poll still shows the conditions, with the marker #19 asked
+  for. Silence here would read as "no warnings" on the very screen whose job is
+  to show them.
+{%- endcomment -%}
+
+<div class="layout layout--col layout--center gap--small">
+
+  {% if forecast_ok == false and warn_count == 0 %}
+
+    <span class="value value--small">No forecast data</span>
+    <span class="label label--xsmall">MET Norway did not answer</span>
+
+  {% elsif warn_count > 0 %}
+
+    <div class="flex flex--row flex--center-y gap--small bg--black px--2 py--1">
+      <span class="title title--small text--white text--uppercase">&#9888; {{ warn_level }}</span>
+    </div>
+    <span class="title title--medium text--center" data-clamp="2">{{ warn_event }}</span>
+    <span class="label label--small text--center" data-clamp="1">
+      {{ warn_area }}{% if warn_count > 1 %} &middot; +{{ warn_count | minus: 1 }} more{% endif %}
+    </span>
+
+  {% else %}
+
+    <div class="flex flex--row flex--center-y gap">
+      {% render "weather_icon", code: now_symbol, box: "w--[56px] h--[56px]" %}
+      <span class="value value--xlarge value--tnums" data-fit-value="true">{{ now_temp | round: 0 }}&deg;</span>
+    </div>
+    <span class="label label--small text--center" data-clamp="1">
+      {{ place | default: "Forecast" }} &middot; feels {{ now_feels | round: 0 }}&deg; &middot; {{ now_wind | round: 0 }} m/s {{ now_dir }}
+    </span>
+    {% if warnings_ok == false %}
+      <span class="label label--xsmall label--outline">Warnings unavailable</span>
+    {% endif %}
+
+  {% endif %}
+
+</div>
