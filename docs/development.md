@@ -33,7 +33,8 @@ Routes that are useful without a browser:
 `trmnlp` cannot render a PNG narrower than about 450px: its headless Firefox
 refuses to size the window below that, and `/render/half_vertical.png` fails
 with `the browser clamped the viewport to 450x480`. That covers
-**half_vertical** (400x480) and **quadrant** (400x240).
+**half_vertical** (400x480) and **quadrant** (400x240). The full layout
+(800x480) and **half_horizontal** (800x240) are wide enough to render normally.
 
 Use the HTML render in a browser sized to the real viewport instead:
 
@@ -194,6 +195,18 @@ There is no narrower key to hand out, so:
 - `{% render %}` takes comma-separated arguments:
   `{% render "weather_icon", code: x, box: "..." %}`.
 - `{% render %}` gets an isolated scope. Everything it needs must be an argument.
+- **`trmnlp push` rewrites `src/settings.yml`.** It replaces the file with the
+  server's canonical form: comments stripped, keys reordered, `description` and
+  every unset `oauth_*` field added. Do not put anything in that file you need
+  to survive a push. That is why the reason the `id` matters is written here and
+  not as a comment beside it.
+- **A 1px vertical rule can vanish on a 1-bit screen.** `divider--v` computes to
+  0.97px wide, and whether it survives rasterisation depends on where its
+  sub-pixel x position falls. In the half horizontal layout two identical rules
+  behaved differently: the one at x=533 painted 29 pixels, and the one at x=213
+  painted **nothing at all**, in any neighbouring column. Add `w--[2px]` to a
+  vertical rule so it always covers a whole device pixel. A horizontal rule is
+  safe, because its 1px height lands on a pixel row.
 - `probability_of_precipitation` is a Nordic-area value. It was absent at every
   one of the 62 time steps of the Greenland Sea point, where `precipitation_amount`
   was still there. Any value from `/complete` needs a check before it is trusted
