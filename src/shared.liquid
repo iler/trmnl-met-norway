@@ -84,6 +84,7 @@
 {%- comment -%} 4. Warnings. Show the most severe, and count the rest. {%- endcomment -%}
 {%- assign warn_count = 0 -%}
 {%- assign warn_rank = 0 -%}
+{%- assign warn_onset = 0 -%}
 {%- assign warn_level = "" -%}
 {%- assign warn_event = "" -%}
 {%- assign warn_area = "" -%}
@@ -94,8 +95,21 @@
     {%- assign rank = 1 -%}
     {%- if colour == "orange" -%}{%- assign rank = 2 -%}{%- endif -%}
     {%- if colour == "red" -%}{%- assign rank = 3 -%}{%- endif -%}
+    {%- comment -%} Severity first, then the earliest onset. A warning with no
+         interval loses every tie rather than winning it by accident. {%- endcomment -%}
+    {%- assign onset = 99999999999 -%}
+    {%- if feature.when.interval[0] -%}
+      {%- assign onset = feature.when.interval[0] | date: "%s" | times: 1 -%}
+    {%- endif -%}
+    {%- assign take = false -%}
     {%- if rank > warn_rank -%}
+      {%- assign take = true -%}
+    {%- elsif rank == warn_rank and onset < warn_onset -%}
+      {%- assign take = true -%}
+    {%- endif -%}
+    {%- if take -%}
       {%- assign warn_rank = rank -%}
+      {%- assign warn_onset = onset -%}
       {%- assign warn_level = colour | upcase -%}
       {%- assign warn_event = feature.properties.eventAwarenessName -%}
       {%- assign warn_area = feature.properties.area -%}

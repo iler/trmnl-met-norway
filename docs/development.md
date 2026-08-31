@@ -28,6 +28,63 @@ Routes that are useful without a browser:
 | `/data` | the merge variables as JSON |
 | `/poll` | a fresh poll of both URLs |
 
+## Preview the small layouts
+
+`trmnlp` cannot render a PNG narrower than about 450px: its headless Firefox
+refuses to size the window below that, and `/render/half_vertical.png` fails
+with `the browser clamped the viewport to 450x480`. That covers
+**half_vertical** (400x480) and **quadrant** (400x240).
+
+Use the HTML render in a browser sized to the real viewport instead:
+
+```
+http://localhost:4567/render/half_vertical.html?width=400&height=480
+http://localhost:4567/render/quadrant.html?width=400&height=240
+```
+
+The full layout is 800x480 and renders to PNG normally.
+
+## Test a warning when Norway is calm
+
+MET issues warnings for one area at a time and does exact point-in-polygon, so
+a point falls in exactly one area. On a calm day no real coordinate produces two
+warnings, and the "+N more" and severity-tie paths cannot be reached from live
+data.
+
+Override the payload in `.trmnlp.yml`. The `variables:` block replaces any
+top-level key, not only `trmnl`:
+
+```yaml
+variables:
+  trmnl:
+    plugin_settings:
+      instance_name: Helsinki
+  IDX_1:
+    lastChange: '2026-08-31T00:00:00+00:00'
+    features:
+      - properties:
+          riskMatrixColor: Orange
+          eventAwarenessName: Gale
+          area: Vestfjorden
+        when:
+          interval: ['2026-08-31T18:00:00+00:00', '2026-09-01T06:00:00+00:00']
+      - properties:
+          riskMatrixColor: Orange
+          eventAwarenessName: Extreme rainfall
+          area: Nordland
+        when:
+          interval: ['2026-08-31T03:00:00+00:00', '2026-08-31T15:00:00+00:00']
+```
+
+Two warnings of equal severity with different onsets test the tie-break: the
+screen must show **Extreme rainfall**, the earlier one, not the first in the
+list.
+
+The override **deep-merges**, so it can add or replace a value but cannot empty
+one out. `IDX_0: {}` and `timeseries: []` both leave the real payload in place.
+To test a failed poll, point the URL in `src/settings.yml` at a path that does
+not exist, as described below.
+
 ## Preview another place
 
 Edit `custom_fields` and `time_zone` in `.trmnlp.yml`. Do not use
