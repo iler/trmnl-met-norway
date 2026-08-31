@@ -1,37 +1,54 @@
 #!/usr/bin/env bash
 # Push src/ to the TRMNL plugin named by `id` in src/settings.yml.
 #
-# The key comes from the 1Password Environment mounted at ./.env. It is passed
-# to Docker by name, not by value, so it never reaches the shell history or the
-# process list.
+# TRMNL_API_KEY is an ACCOUNT key: it reads and writes every private plugin on
+# the account. It is deliberately NOT in this repo's 1Password Environment.
+# That mount holds plugin-scoped secrets, and a key with a wider scope than the
+# mount would be copied into every plugin repo — many places to rotate, and an
+# account-wide key readable by everything in each of them. One canonical item
+# feeds every plugin repo instead, so a rotation is one edit.
 #
-#   bin/push            # interactive, asks before it overwrites
-#   bin/push --force    # no prompt; see the warning in docs/development.md
+# The key is taken from the first source that has it:
+#   1. TRMNL_API_KEY already in the environment — GitHub Actions, or an export
+#   2. `op read` of TRMNL_API_KEY_REF — a local push
+#
+# Override the reference for a different vault or item name:
+#   export TRMNL_API_KEY_REF="op://Vault/Item/field"
+#
+#   bin/push            # asks before it overwrites
+#   bin/push --force    # no prompt; see docs/development.md
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-if [ ! -e .env ]; then
-  echo "bin/push: no .env mount at $PWD/.env." >&2
-  echo "Mount the 1Password Environment first. See docs/development.md." >&2
-  exit 1
-fi
-
-set -a
-# shellcheck source=/dev/null
-. ./.env
-set +a
+: "${TRMNL_API_KEY_REF:=op://Private/TRMNL/credential}"
 
 if [ -z "${TRMNL_API_KEY:-}" ]; then
-  echo "bin/push: TRMNL_API_KEY is not in the mounted .env." >&2
-  echo "Add it to the 1Password Environment. See .env.example." >&2
-  exit 1
+  if ! command -v op >/dev/null 2>&1; then
+    echo "bin/push: TRMNL_API_KEY is not set and the 1Password CLI is not installed." >&2
+    echo "Install op, or export TRMNL_API_KEY for this command only." >&2
+    exit 1
+  fi
+  if ! TRMNL_API_KEY="$(op read "$TRMNL_API_KEY_REF" 2>/dev/null)" || [ -z "$TRMNL_API_KEY" ]; then
+    echo "bin/push: could not read the TRMNL account key from 1Password." >&2
+    echo "  reference: $TRMNL_API_KEY_REF" >&2
+    echo "Point TRMNL_API_KEY_REF at the item that holds it. See docs/development.md." >&2
+    exit 1
+  fi
+  export TRMNL_API_KEY
 fi
 
-tty_flag=()
-[ -t 0 ] && tty_flag=(-it)
-
-exec docker run --rm "${tty_flag[@]}" \
-  -e TRMNL_API_KEY \
-  -v "$PWD:/plugin" \
-  trmnl/trmnlp push "$@"
+# Written out twice rather than with an array: under `set -u`, expanding an
+# empty array is an unbound-variable error in bash 3.2, which is what macOS
+# ships, so the array form fails every non-interactive run.
+if [ -t 0 ]; then
+  exec docker run --rm -it \
+    -e TRMNL_API_KEY \
+    -v "$PWD:/plugin" \
+    trmnl/trmnlp push "$@"
+else
+  exec docker run --rm \
+    -e TRMNL_API_KEY \
+    -v "$PWD:/plugin" \
+    trmnl/trmnlp push "$@"
+fi

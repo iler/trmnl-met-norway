@@ -121,10 +121,19 @@ bin/push            # asks before it overwrites
 bin/push --force    # no prompt
 ```
 
-`bin/push` reads `TRMNL_API_KEY` from the 1Password Environment mounted at
-`./.env`, and hands it to Docker **by name, not by value**. Do not write
-`-e TRMNL_API_KEY=<the key>` by hand: that puts the secret in your shell
-history and in the process list for everyone on the machine.
+`bin/push` takes the key from the first source that has it:
+
+1. `TRMNL_API_KEY` already in the environment — GitHub Actions, or an export.
+2. `op read` of `TRMNL_API_KEY_REF`, which defaults to
+   `op://Private/TRMNL/credential`. Override it for a different vault or item:
+
+   ```sh
+   export TRMNL_API_KEY_REF="op://Vault/Item/field"
+   ```
+
+Either way it hands the key to Docker **by name, not by value**, so it never
+reaches your shell history or the process list. Do not write
+`-e TRMNL_API_KEY=<the key>` by hand.
 
 Lint first. It needs no key, so it costs nothing:
 
@@ -148,14 +157,27 @@ run it.
 ## The API key, and who can hold one
 
 The key is **per account, not per plugin**. It reads and writes every private
-plugin on the account. There is no narrower key to hand out, so:
+plugin on the account.
+
+**It is not in this repo's 1Password Environment, and it should not be added.**
+That Environment holds the secrets of one plugin; a key with a wider scope than
+the mount would be copied into every plugin repo, which means many places to
+rotate and an account-wide key readable by everything in each of them. 1Password
+also allows only ten mounted `.env` files per device, so each repo's mount is a
+budget worth spending on plugin-scoped secrets.
+
+Instead, one canonical item feeds every plugin repo through
+`TRMNL_API_KEY_REF`. A rotation is one edit, and `bin/push` is byte-identical
+across repos, so it can be copied to a new plugin unchanged.
+
+There is no narrower key to hand out, so:
 
 - A second person cannot be given a push key scoped to this plugin. Either the
   account owner does the pushes, or that person is given the account key, which
   gives them every plugin on it.
 - The way to share the *process* is this file plus `.env.example`, never the
-  value. Someone with their own TRMNL account runs `trmnlp login`, or mounts
-  their own 1Password Environment with their own key.
+  value. Someone with their own TRMNL account points `TRMNL_API_KEY_REF` at
+  their own item, or exports `TRMNL_API_KEY` for one command.
 - Agents must not read `./.env`. It is a named pipe that streams the real
   secrets; the repo installs the 1Password validator hook to catch misuse.
 
