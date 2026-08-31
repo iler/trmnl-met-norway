@@ -116,6 +116,26 @@ that does not exist, then poll again.
 
 `src/settings.yml` carries `id: 460164`. `trmnlp push` updates that plugin.
 **Without the id it creates a new plugin on every run**, so never remove it.
+`bin/push` refuses to run when the id is missing, and it checks before fetching
+the key so a doomed push raises no 1Password prompt.
+
+### Using this script in another plugin
+
+`bin/push` holds nothing repo-specific. Copy it to any trmnl plugin project
+unchanged:
+
+```sh
+cp bin/push ../other-plugin/bin/push
+```
+
+**Never copy `src/settings.yml` with it.** Its `id` is the one per-plugin value,
+and pushing with another plugin's id overwrites that plugin — silently, because
+it is a valid update. Copying a whole repo as a template is where this bites.
+
+Prefer a copy in each repo over one shared script on your `PATH`: the repos are
+public and document this loop, so a clone should be able to run it, and the CI
+push job (when there is one) runs from a fresh checkout. It is also what
+`trmnlp init` does, with its per-project `bin/trmnlp`.
 
 ```sh
 bin/push            # asks before it overwrites
