@@ -64,9 +64,10 @@ custom_fields:
     &middot; MET Norway API:
     <a href="https://api.met.no/">api.met.no</a>
   help_text: >-
-    Your coordinates are stored by TRMNL and sent from TRMNL's servers to MET
-    Norway. This plugin only reads a public forecast — it sends no personal
-    information, it writes nothing, and nothing is sent anywhere else.
+    Your coordinates are stored by TRMNL. TRMNL's own servers send them to MET
+    Norway once an hour and keep the answer until the next refresh; your display
+    never contacts MET Norway itself. The plugin reads a public forecast, writes
+    nothing, and sends nothing anywhere else.
   github_url: https://github.com/iler/trmnl-met-norway
   learn_more_url: https://api.met.no/
 - keyname: latitude

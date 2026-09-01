@@ -11,6 +11,13 @@
       "18/16" collides with its neighbour at 66px.
     - a vertical rule separates the three zones. Without it the six hour columns
       and the four day columns read as one strip of ten.
+
+  `divider--v` is a real framework class: it ships in plugins.css for the
+  pinned 3.3.0 and for latest. `w--[2px]` beside it is deliberate, not padding.
+  The class computes to 0.97px wide, and at that width whether it survives a
+  1-bit render depends on where its sub-pixel x position falls: two identical
+  rules on this screen behaved differently until the width was forced to a
+  whole device pixel. Do not replace it with a 1px div.
     - the warning area name goes, as on the half vertical.
 
   Nothing changes count when a warning appears. On the taller layouts the

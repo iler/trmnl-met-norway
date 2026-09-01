@@ -91,6 +91,12 @@
 {%- assign warnings_ok = false -%}
 {%- if IDX_1.lastChange -%}{%- assign warnings_ok = true -%}{%- endif -%}
 
+{%- comment -%} trmnl.user.utc_offset is a number of seconds, so adding it to an
+     epoch and formatting the result gives the reader's local time. This is
+     TRMNL's own documented idiom, not arithmetic of ours:
+       {{ timestamp | date: "%s" | plus: trmnl.user.utc_offset | date: "%R" }}
+     Every local time below is built this way. Verified against a jq derivation
+     of the same payload at UTC+3. {%- endcomment -%}
 {%- assign tz = trmnl.user.utc_offset -%}
 {%- assign place = trmnl.plugin_settings.custom_fields_values.location_name -%}
 
