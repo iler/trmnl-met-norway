@@ -41,7 +41,13 @@
 </svg>
 
 {%- comment -%} 2. symbol_code -> glyph. MET builds every code from the same words,
-     so the words decide the glyph and no 88-line table is needed. {%- endcomment -%}
+     so the words decide the glyph and no 88-line table is needed.
+
+     The rules cover all 88 codes MET issues today. A code MET adds later that
+     matches none of these words falls back to wi-cloudy on purpose: a cloud is
+     the least wrong picture of unknown weather, and a missing glyph would leave
+     a hole in the strip. Add a rule above when a new family appears; do not
+     change the fallback. {%- endcomment -%}
 {% template weather_icon %}
   {%- assign night = false -%}
   {%- if code contains "_night" or code contains "polartwilight" -%}{%- assign night = true -%}{%- endif -%}
