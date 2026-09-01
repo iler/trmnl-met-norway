@@ -88,6 +88,7 @@ custom_fields:
   field_type: string
   name: Location name
   description: Shown on the screen. The forecast gives no place name.
+  help_text: Leave it blank and the screen says "Forecast" instead of a place.
   placeholder: Helsinki
   optional: true
 name: Forecast and Warnings

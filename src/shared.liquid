@@ -150,10 +150,17 @@
   {%- assign updated = IDX_0.properties.meta.updated_at | date: "%s" | plus: tz -%}
 {%- endif -%}
 
-{%- comment -%} 6. Days. One pass over the series, because the array filters cannot
-     reach a nested key (see the Liquid research). Each day becomes
-     "epoch|max|min|symbol", joined with ";". Today is skipped: the hero and the
-     hour strip already own it. {%- endcomment -%}
+{%- comment -%} 6. Days. One pass over the series, accumulating into a string.
+
+     The binding constraint is not the array filters: it is that Liquid cannot
+     build an array of records at all. There is no hash literal and no way to
+     append to an array, so a per-day aggregate has to be packed into text and
+     split on the way out. Each day becomes "epoch|max|min|symbol", joined with
+     ";". The array filters are awkward here too, since `where` and `find_by`
+     read a top-level key, though `where_exp` can evaluate a nested one.
+
+     The band starts today, so today's blocks count: they are the ones left in
+     the day, not the whole day. {%- endcomment -%}
 {%- assign days = "" -%}
 {%- assign day_key = "" -%}
 {%- assign day_epoch = 0 -%}
@@ -186,7 +193,10 @@
       {%- endif -%}
     {%- endif -%}
     {%- comment -%} The day gets the symbol of its first afternoon block, so a
-         daytime glyph stands for the day. {%- endcomment -%}
+         daytime glyph stands for the day. A day with no block at or after noon
+         keeps the symbol of its first block, assigned on the day change above.
+         That is a defined fallback, not a leftover, and the last day of the
+         series is usually the only one it applies to. {%- endcomment -%}
     {%- unless day_symbol_fixed -%}
       {%- assign hour = local | date: "%H" | times: 1 -%}
       {%- if hour >= 12 -%}
