@@ -38,34 +38,44 @@ custom_fields:
   name: About This Plugin
   category: environment,nature
   description: |-
-    A forecast for one place, and the severe weather warnings that MET Norway
-    issues for it.
+    <p>A forecast for one place, and the severe weather warnings that MET
+    Norway issues for it.</p>
 
-    What the screen shows:
-    - Now: the weather symbol, the temperature, the feels-like temperature and
-      the wind.
-    - The next 12 hours, in steps of 2 hours, with the chance of precipitation.
-    - The next 5 days, with the highest and the lowest temperature.
-    - A warning band, when MET Norway issues a warning for your place.
+    <p><strong>What the screen shows</strong></p>
+    <ul>
+      <li>Now: the weather symbol, the temperature, the feels-like temperature
+        and the wind.</li>
+      <li>The next 12 hours, in steps of 2 hours, with the chance of
+        precipitation.</li>
+      <li>The next 5 days, with the highest and the lowest temperature.</li>
+      <li>A warning band, when MET Norway issues a warning for your place.</li>
+    </ul>
 
-    The warnings are the reason this plugin exists. MET Norway issues them for
-    Norway only, so most places never show one. When there is no warning, the
-    screen gives that space to the forecast instead. Severity is a word, not a
-    colour, because the screen has only black and white.
+    <p>The warnings are the reason this plugin exists. MET Norway issues them
+    for Norway only, so most places never show one. When there is no warning,
+    the screen gives that space to the forecast. Severity is a word, not a
+    colour, because the screen has only black and white.</p>
 
-    To set it up, give a latitude and a longitude with 4 decimals at most. MET
-    Norway refuses more than 4. A location name is optional: the forecast does
-    not supply one, so the screen has nothing to call the place without it.
+    <p><strong>How to set it up</strong></p>
+    <ul>
+      <li>Give a latitude and a longitude with 4 decimals at most. MET Norway
+        refuses more than 4.</li>
+      <li>A location name is optional. The forecast does not supply one, so
+        without it the screen has nothing to call the place.</li>
+    </ul>
 
-    Keep the refresh rate at 60 minutes or slower. MET Norway counts requests
-    for the whole plugin, across everyone who installs it. A faster rate risks
-    MET Norway throttling the plugin for every installer, not only for you.
+    <p><strong>Keep the refresh rate at 60 minutes or slower.</strong> MET
+    Norway counts requests for the whole plugin, across everyone who installs
+    it. A faster rate risks MET Norway throttling the plugin for every
+    installer, not only for you.</p>
 
-    Data from MET Norway, licensed CC BY 4.0, see
-    creativecommons.org/licenses/by/4.0/. This is not an official MET Norway
-    plugin. MET Norway does not endorse it.
+    <p>Data from MET Norway, licensed
+    <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. This
+    is not an official MET Norway plugin. MET Norway does not endorse it.</p>
 
-    Source, and a place to report a fault: github.com/iler/trmnl-met-norway
+    <p><a href="https://github.com/iler/trmnl-met-norway">Source code and fault
+    reports</a> &middot; <a href="https://api.met.no/">About the MET Norway
+    API</a></p>
   github_url: https://github.com/iler/trmnl-met-norway
   learn_more_url: https://api.met.no/
 - keyname: latitude
