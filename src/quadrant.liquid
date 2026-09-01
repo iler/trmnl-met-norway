@@ -26,9 +26,9 @@
   {% elsif warn_count > 0 %}
 
     <div class="flex flex--row flex--center-y gap--small bg--black px--2 py--1">
-      <span class="title title--small text--white text--uppercase">&#9888; {{ warn_level }}</span>
+      <span class="title title--small lg:title--base text--white text--uppercase">&#9888; {{ warn_level }}</span>
     </div>
-    <span class="title title--medium text--center" data-clamp="2">{{ warn_event }}</span>
+    <span class="title title--medium lg:title--large text--center" data-clamp="2">{{ warn_event }}</span>
     <span class="label label--small text--center" data-clamp="1">
       {{ warn_area }}{% if warn_count > 1 %} &middot; +{{ warn_count | minus: 1 }} more{% endif %}
     </span>
@@ -36,8 +36,8 @@
   {% else %}
 
     <div class="flex flex--row flex--center-y gap">
-      {% render "weather_icon", code: now_symbol, box: "w--[56px] h--[56px]" %}
-      <span class="value value--xlarge value--tnums" data-fit-value="true">{{ now_temp | round: 0 }}&deg;</span>
+      {% render "weather_icon", code: now_symbol, box: "w--[56px] h--[56px] lg:w--[88px] lg:h--[88px]" %}
+      <span class="value value--xlarge lg:value--xxlarge value--tnums" data-fit-value="true">{{ now_temp | round: 0 }}&deg;</span>
     </div>
     <span class="label label--small text--center" data-clamp="1">
       {{ place | default: "Forecast" }} &middot; feels {{ now_feels | round: 0 }}&deg; &middot; {{ now_wind | round: 0 }} m/s {{ now_dir }}

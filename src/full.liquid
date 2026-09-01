@@ -14,8 +14,8 @@
     {%- comment -%} Warning band. Severity is a word, because the screen has no colour. {%- endcomment -%}
     {% if warn_count > 0 %}
       <div class="flex flex--row flex--center-y gap bg--black px--2 py--1">
-        <span class="title title--small text--white text--uppercase">&#9888; {{ warn_level }}</span>
-        <span class="label label--small text--white">{{ warn_event }} &middot; {{ warn_area }}</span>
+        <span class="title title--small lg:title--medium text--white text--uppercase">&#9888; {{ warn_level }}</span>
+        <span class="label label--small lg:label--base text--white">{{ warn_event }} &middot; {{ warn_area }}</span>
         {% if warn_count > 1 %}
           <div class="grow"></div>
           <span class="label label--small text--white">+{{ warn_count | minus: 1 }} more</span>
@@ -29,14 +29,14 @@
 
     {%- comment -%} Hero. {%- endcomment -%}
     <div class="flex flex--row flex--center-y gap--large">
-      {% render "weather_icon", code: now_symbol, box: "w--[104px] h--[104px]" %}
+      {% render "weather_icon", code: now_symbol, box: "w--[104px] h--[104px] lg:w--[152px] lg:h--[152px] portrait:w--[136px] portrait:h--[136px]" %}
       <div class="flex flex--col gap--none">
-        <span class="value value--xxlarge value--tnums" data-fit-value="true">{{ now_temp | round: 0 }}&deg;</span>
-        <span class="label">Feels like {{ now_feels | round: 0 }}&deg; &middot; {{ now_wind | round: 0 }} m/s {{ now_dir }}</span>
+        <span class="value value--xxlarge lg:value--mega portrait:value--xxxlarge value--tnums" data-fit-value="true">{{ now_temp | round: 0 }}&deg;</span>
+        <span class="label lg:label--large portrait:label--medium">Feels like {{ now_feels | round: 0 }}&deg; &middot; {{ now_wind | round: 0 }} m/s {{ now_dir }}</span>
       </div>
       <div class="grow"></div>
-      <div class="flex flex--col gap--none text--right w--[200px] no-shrink">
-        <span class="title title--medium" data-clamp="1">{{ place | default: "Forecast" }}</span>
+      <div class="flex flex--col gap--none text--right w--[200px] lg:w--[280px] no-shrink">
+        <span class="title title--medium lg:title--xlarge portrait:title--large" data-clamp="1">{{ place | default: "Forecast" }}</span>
       </div>
     </div>
 
@@ -46,10 +46,10 @@
       {% for record in hour_list %}
         {% assign hour = record | split: "|" %}
         <div class="flex flex--col flex--center-x gap--none">
-          <span class="label label--small">{{ hour[0] | times: 1 | date: "%H" }}</span>
-          {% render "weather_icon", code: hour[2], box: "w--[44px] h--[44px]" %}
-          <span class="value value--small value--tnums">{{ hour[1] }}&deg;</span>
-          <span class="label label--xsmall">{% if hour[3] %}{{ hour[3] }}{{ hour[4] }}{% else %}&nbsp;{% endif %}</span>
+          <span class="label label--small lg:label--medium portrait:label--base">{{ hour[0] | times: 1 | date: "%H" }}</span>
+          {% render "weather_icon", code: hour[2], box: "w--[44px] h--[44px] lg:w--[64px] lg:h--[64px] portrait:w--[56px] portrait:h--[56px]" %}
+          <span class="value value--small lg:value--large portrait:value--medium value--tnums">{{ hour[1] }}&deg;</span>
+          <span class="label label--xsmall lg:label--base portrait:label--small">{% if hour[3] %}{{ hour[3] }}{{ hour[4] }}{% else %}&nbsp;{% endif %}</span>
         </div>
       {% endfor %}
     </div>
@@ -60,9 +60,9 @@
       {% for record in day_list limit: 5 %}
         {% assign day = record | split: "|" %}
         <div class="flex flex--col flex--center-x gap--none">
-          <span class="label label--small text--uppercase">{% if forloop.first %}Today{% else %}{{ day[0] | times: 1 | date: "%a" }}{% endif %}</span>
-          {% render "weather_icon", code: day[3], box: "w--[40px] h--[40px]" %}
-          <span class="value value--small value--tnums">{{ day[1] | round: 0 }}&deg; / {{ day[2] | round: 0 }}&deg;</span>
+          <span class="label label--small lg:label--medium portrait:label--base text--uppercase">{% if forloop.first %}Today{% else %}{{ day[0] | times: 1 | date: "%a" }}{% endif %}</span>
+          {% render "weather_icon", code: day[3], box: "w--[40px] h--[40px] lg:w--[60px] lg:h--[60px] portrait:w--[52px] portrait:h--[52px]" %}
+          <span class="value value--small lg:value--medium value--tnums">{{ day[1] | round: 0 }}&deg; / {{ day[2] | round: 0 }}&deg;</span>
         </div>
       {% endfor %}
     </div>
@@ -71,6 +71,7 @@
 {% endif %}
 
 <div class="title_bar">
+  <img class="image image-stroke" src="data:image/svg+xml;base64,{{ svg_logo | base64_encode }}" />
   <span class="title">Forecast and Warnings</span>
   <span class="instance">MET Norway &middot; CC BY 4.0 &middot; {{ updated | date: "%H:%M" }}</span>
 </div>

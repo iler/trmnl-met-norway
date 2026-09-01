@@ -45,6 +45,33 @@ http://localhost:4567/render/quadrant.html?width=400&height=240
 
 The full layout is 800x480 and renders to PNG normally.
 
+## Preview a device other than the OG
+
+`lg:` and `portrait:` are **not media queries**. The framework gates them on a
+class on the screen wrapper — `.trmnl .screen--lg .lg\:value--mega` — so a wide
+viewport alone activates nothing. `trmnlp` takes the classes as a query
+parameter, and the model picker on the preview page builds them. The real sets:
+
+| Device | Screen classes | Size |
+|---|---|---|
+| TRMNL OG (2-bit) | `screen screen--1bit screen--ogv2 screen--md screen--1x` | 800x480 |
+| TRMNL X landscape | `screen screen--4bit screen--v2 screen--lg screen--1x` | 1040x780 |
+| TRMNL X portrait | `screen screen--4bit screen--v2 screen--lg screen--portrait screen--1x` | 780x1040 |
+
+```sh
+curl "http://localhost:4567/render/full.png?width=1040&height=780\
+&screen_classes=screen%20screen--4bit%20screen--v2%20screen--lg%20screen--1x" -o x.png
+```
+
+**TRMNL X is 1040x780 in CSS pixels, not 1872x1404.** The device is 1872x1404
+at a `scale_factor` of 1.8, and the picker divides one by the other. Rendering
+at 1872 wide gives a viewport no device has, and the layout sits in the corner.
+The plugin's own refresh log prints the scale factor.
+
+Do not invent the class names. `screen--v2` and `screen--ogv2` are different
+devices, and guessing the wrong one makes the OG layout overflow, which looks
+exactly like a layout bug.
+
 ## Test a warning when Norway is calm
 
 MET issues warnings for one area at a time and does exact point-in-polygon, so
@@ -267,6 +294,14 @@ There is no narrower key to hand out, so:
   painted **nothing at all**, in any neighbouring column. Add `w--[2px]` to a
   vertical rule so it always covers a whole device pixel. A horizontal rule is
   safe, because its 1px height lands on a pixel row.
+- **An arbitrary size must be a multiple of 4.** The size scale runs in 4px
+  steps, so `w--[150px]` matches no class and the element silently keeps its
+  base size, with no error anywhere. 152 works. This cost a render that looked
+  like `lg:` was broken when only one value was.
+- **Pale vertical bands under icons in a `trmnlp` 4-bit PNG are not real.** The
+  DOM has no background at those points, and a browser screenshot of the same
+  URL and classes is clean. They come from `trmnlp`'s own PNG path, not from the
+  markup, and they do not reach a device.
 - `probability_of_precipitation` is a Nordic-area value. It was absent at every
   one of the 62 time steps of the Greenland Sea point, where `precipitation_amount`
   was still there. Any value from `/complete` needs a check before it is trusted
