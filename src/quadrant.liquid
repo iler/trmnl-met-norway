@@ -40,7 +40,7 @@
       <span class="value value--xlarge lg:value--xxlarge value--tnums" data-fit-value="true">{{ now_temp | round: 0 }}&deg;</span>
     </div>
     <span class="label label--small text--center" data-clamp="1">
-      {{ place | default: "Forecast" }} &middot; feels {{ now_feels | round: 0 }}&deg; &middot; {{ now_wind | round: 0 }} m/s {{ now_dir }}
+      Feels {{ now_feels | round: 0 }}&deg; &middot; {{ now_wind | round: 0 }} m/s {{ now_dir }}
     </span>
     {% if warnings_ok == false %}
       <span class="label label--xsmall label--outline">Warnings unavailable</span>
@@ -48,4 +48,10 @@
 
   {% endif %}
 
+</div>
+
+<div class="title_bar">
+  <img class="image image-stroke" src="data:image/svg+xml;base64,{{ svg_logo | base64_encode }}" />
+  <span class="title">{{ place | default: "Forecast" }}</span>
+  <span class="instance">MET Norway</span>
 </div>
