@@ -37,45 +37,36 @@ custom_fields:
   field_type: author_bio
   name: About This Plugin
   category: environment,nature
-  description: |-
-    <p>A forecast for one place, and the severe weather warnings that MET
-    Norway issues for it.</p>
-
-    <p><strong>What the screen shows</strong></p>
-    <ul>
-      <li>Now: the weather symbol, the temperature, the feels-like temperature
-        and the wind.</li>
-      <li>The next 12 hours, in steps of 2 hours, with the chance of
-        precipitation.</li>
-      <li>The next 5 days, with the highest and the lowest temperature.</li>
-      <li>A warning band, when MET Norway issues a warning for your place.</li>
-    </ul>
-
-    <p>The warnings are the reason this plugin exists. MET Norway issues them
-    for Norway only, so most places never show one. When there is no warning,
-    the screen gives that space to the forecast. Severity is a word, not a
-    colour, because the screen has only black and white.</p>
-
-    <p><strong>How to set it up</strong></p>
-    <ul>
-      <li>Give a latitude and a longitude with 4 decimals at most. MET Norway
-        refuses more than 4.</li>
-      <li>A location name is optional. The forecast does not supply one, so
-        without it the screen has nothing to call the place.</li>
-    </ul>
-
-    <p><strong>Keep the refresh rate at 60 minutes or slower.</strong> MET
-    Norway counts requests for the whole plugin, across everyone who installs
-    it. A faster rate risks MET Norway throttling the plugin for every
-    installer, not only for you.</p>
-
-    <p>Data from MET Norway, licensed
-    <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. This
-    is not an official MET Norway plugin. MET Norway does not endorse it.</p>
-
-    <p><a href="https://github.com/iler/trmnl-met-norway">Source code and fault
-    reports</a> &middot; <a href="https://api.met.no/">About the MET Norway
-    API</a></p>
+  description: >-
+    A forecast for one place, and the severe weather warnings that MET Norway
+    issues for it: the weather now, the next 12 hours in steps of 2 hours, and
+    the next 5 days. When MET Norway issues a warning for your place, a band
+    across the top of the screen names it. Severity is a word, not a colour,
+    because the screen has only black and white.
+    <br><br>
+    The warnings are the reason this recipe exists. MET Norway issues them for
+    Norway only, so most places never show one. When there is no warning, the
+    screen gives that space back to the forecast.
+    <br><br>
+    Set a latitude and a longitude with 4 decimals at most, because MET Norway
+    refuses more than 4. A location name is optional: the forecast carries no
+    place name, so without it the screen has nothing to call the place.
+    <br><br>
+    Keep the refresh rate at 60 minutes or slower. MET Norway counts requests
+    for the whole recipe, across everyone who installs it, so a faster rate
+    risks throttling for every installer and not only for you.
+    <br><br>
+    Built by Ilari Mäkelä. Data from MET Norway, licensed
+    <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Not
+    an official MET Norway plugin, and not endorsed by MET Norway. Source and
+    issues:
+    <a href="https://github.com/iler/trmnl-met-norway">github.com/iler/trmnl-met-norway</a>
+    &middot; MET Norway API:
+    <a href="https://api.met.no/">api.met.no</a>
+  help_text: >-
+    Your coordinates are stored by TRMNL and sent from TRMNL's servers to MET
+    Norway. This plugin only reads a public forecast — it sends no personal
+    information, it writes nothing, and nothing is sent anywhere else.
   github_url: https://github.com/iler/trmnl-met-norway
   learn_more_url: https://api.met.no/
 - keyname: latitude
