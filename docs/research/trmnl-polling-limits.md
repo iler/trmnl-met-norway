@@ -132,7 +132,24 @@ UNKNOWN — not confirmed: the exact default user agent string that TRMNL sends 
 `user-agent` header is given. TRMNL does not publish it. The `http.rb/6.0.0 (TRMNL
 API)` string found in `usetrmnl/trmnl-api` belongs to a client library that calls the
 TRMNL API. It is not the polling fetcher. Do not rely on it. Because MET returns 403
-for a missing or generic agent, always set the header.
+for a browser-like agent, always set the header.
+
+Corrected on 2026-09-04 by measurement against
+`locationforecast/2.0/complete`. MET does not reject a *missing* agent, it
+rejects one that looks like a browser:
+
+| Request | Response |
+|---|---|
+| Default `curl/8.x` agent | 200 |
+| `Mozilla/5.0` | **403** |
+| No `User-Agent` header at all | 200 |
+| `trmnl-met-norway/1.0 github.com/iler/trmnl-met-norway` | 200 |
+
+This does not change the decision. The MET terms require an identifying agent
+with contact information whether or not MET enforces it, and enforcement can
+tighten without notice. It does change the diagnosis: a plugin that loses the
+header will not necessarily fail, so a missing header cannot be ruled in or out
+from a 200 alone.
 
 TRMNL polling comes from fixed server IPs on Hetzner Cloud, published at
 `https://trmnl.com/api/ips`.
