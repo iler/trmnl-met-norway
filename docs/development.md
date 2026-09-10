@@ -294,10 +294,43 @@ There is no narrower key to hand out, so:
   painted **nothing at all**, in any neighbouring column. Add `w--[2px]` to a
   vertical rule so it always covers a whole device pixel. A horizontal rule is
   safe, because its 1px height lands on a pixel row.
-- **An arbitrary size must be a multiple of 4.** The size scale runs in 4px
-  steps, so `w--[150px]` matches no class and the element silently keeps its
-  base size, with no error anywhere. 152 works. This cost a render that looked
-  like `lg:` was broken when only one value was.
+- **The size scale has no `medium`, and labels have no `xsmall`.** The real
+  ladder is `xsmall`, `small`, `base`, `large`, `xlarge`, `xxlarge`, and labels
+  start at `small`. `value--medium`, `label--medium`, `title--medium`,
+  `label--xsmall` and `text--uppercase` match nothing in 3.3.0 and are dropped
+  in silence — no error, no warning, and `lint` does not see them either. The
+  three `--medium` names cost nothing, because the element keeps the base size,
+  which is what `--base` would have given it anyway. `label--xsmall` is the one
+  that lied: it fell back to `label`'s **16px**, which is *larger* than
+  `label--small`'s 12px, so every "small print" label on every layout was
+  drawn bigger than the value it sat under. To check a whole layout at once:
+
+  ```sh
+  curl -sL https://trmnl.com/css/3.3.0/plugins.css -o /tmp/plugins.css
+  grep -oh 'class="[^"]*"' src/*.liquid | tr ' ' '\n' \
+    | sed 's/class="//;s/"//;s/^lg:portrait://;s/^lg://;s/^portrait://' \
+    | grep -v '^$' | sort -u \
+    | while read c; do grep -qF ".$(printf %s "$c" | sed 's/:/\\:/g')" \
+        /tmp/plugins.css || echo "MISSING: $c"; done
+  ```
+
+  Read the output: `{{ … }}` and the `render` arguments are not classes, and an
+  arbitrary size like `w--[52px]` is checked by the rule below instead.
+- **An arbitrary size stops at 128px.** `w--[Npx]` and `h--[Npx]` ship for every
+  whole N from 0 to 128, in 1px steps — so `w--[2px]` is fine and `w--[130px]`
+  matches no class at all. Above the ceiling the element silently keeps its base
+  size, with no error anywhere.
+
+  This was written up here as a **4px step rule**, which was wrong, and the
+  correction it prescribed did not work: `w--[150px]` and `w--[152px]` are both
+  dead, so the full screen's hero icon stayed at its 104px base size on the
+  TRMNL X for as long as the note stood. That is the symptom to expect — one
+  value that looks like `lg:` is broken. Use the audit above; it catches this
+  too, once the bracket is escaped for the grep.
+
+  There is no larger px class to move up to. The only widths past 128px are
+  `w--[Ncqw]`, which are percentages of a query container, so anything bigger
+  has to be expressed as a share of the container rather than in pixels.
 - **Pale vertical bands under icons in a `trmnlp` 4-bit PNG are not real.** The
   DOM has no background at those points, and a browser screenshot of the same
   URL and classes is clean. They come from `trmnlp`'s own PNG path, not from the
