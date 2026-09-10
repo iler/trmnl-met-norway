@@ -370,6 +370,24 @@ There is no narrower key to hand out, so:
   There is no larger px class to move up to. The only widths past 128px are
   `w--[Ncqw]`, which are percentages of a query container, so anything bigger
   has to be expressed as a share of the container rather than in pixels.
+- **TRMNL's screenshot tool renders portrait geometry with landscape classes.**
+  The MCP `markups_screenshot` tool takes an `orientation`. In portrait it gives
+  the right canvas — a quadrant comes back at a 3:4 aspect — but it does **not**
+  put `screen--portrait` on the screen wrapper. `lg:` rules apply and
+  `lg:portrait:` rules do not, so a correct layout comes back looking broken:
+  the row you gated on `lg:portrait:` is missing, and any size you dropped for
+  the narrower columns is still at its landscape size, colliding.
+
+  Read one frame to tell this apart from a real bug. If a `lg:` row is present
+  and a `lg:portrait:` row is absent in the same screenshot, the class is
+  missing, not your markup. Reproduce it by rendering the portrait size in
+  `trmnlp` with the **landscape** class set; the symptoms match exactly.
+
+  The device and the TRMNL browser editor both apply `screen--portrait`. The
+  editor preview, with the TRMNL X and portrait selected, is the check that
+  counts. This cost a round of "the push is broken" before the editor showed
+  both layouts correct.
+
 - **Pale vertical bands under icons in a `trmnlp` 4-bit PNG are not real.** The
   DOM has no background at those points, and a browser screenshot of the same
   URL and classes is clean. They come from `trmnlp`'s own PNG path, not from the
