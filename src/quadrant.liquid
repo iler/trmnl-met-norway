@@ -1,54 +1,142 @@
 {%- comment -%}
-  Quadrant, 400x240: a postcard, about 144px of content height. One thing only.
+  Quadrant. On the OG it is 400x240, a postcard with about 144px of content
+  height. On the TRMNL X the same tile is 520x390, and 390x520 in portrait, so
+  it has more than twice the height. The two screens therefore hold different
+  amounts, and the OG rules the cut: it shows one thing, and every row the X
+  adds carries `hidden` beside its `lg:` class so the OG never sees it.
 
-  Which one thing depends on the weather. This plugin exists to carry MET's
-  warnings (ADR-0001), so when a warning is issued the warning IS the screen and
-  the forecast steps aside. Otherwise the screen is the current conditions.
-  This is the only layout where the warning replaces the forecast rather than
-  shrinking it, because it is the only one with no room to do both.
+  Which one thing the OG shows depends on the weather. This plugin exists to
+  carry MET's warnings (ADR-0001), so when a warning is issued the warning IS
+  the OG screen and the forecast steps aside. On the X the warning is a band
+  across the top and the forecast keeps its place, as on every other layout.
+  The OG quadrant is the only screen anywhere that drops the forecast, because
+  it is the only one with no room to do both.
 
-  No title bar: #9 puts the CC BY credit on the full screen and both halves,
-  and leaves the quadrant to carry it in the author bio. That buys back the
-  height the one thing needs.
+  What the X adds under the hero: the next twelve hours, then the next four
+  days, each behind a rule. Both bands copy the half horizontal's, so a mashup
+  of the two reads as one plugin.
+
+  The day band is the first row to go when the tile is short. Landscape is
+  390px tall against portrait's 520px, and the hero plus the hours already fill
+  it, so the day band is hidden again there. `lg:portrait:` is what puts it
+  back.
+
+  The hour temperature is the one size that has to change with the orientation.
+  Six columns of 520px give 87px each, which `value--base` fits; six columns of
+  390px give 65px, where it collides with its neighbour. Portrait drops it to
+  `value--small`.
+
+  No title bar was the earlier cut: #9 puts the CC BY credit on the full screen
+  and both halves, and leaves the quadrant to carry it in the author bio. The
+  bar came back in a9c0e89, so the credit line here stays short.
 
   A failed warnings poll still shows the conditions, with the marker #19 asked
   for. Silence here would read as "no warnings" on the very screen whose job is
   to show them.
 {%- endcomment -%}
 
-<div class="layout layout--col layout--center gap--small">
+{%- comment -%} The forecast hides only where the warning has taken its place,
+     which is the OG and nothing else. {%- endcomment -%}
+{%- assign forecast_show = "flex" -%}
+{%- if warn_count > 0 -%}{%- assign forecast_show = "hidden lg:flex" -%}{%- endif -%}
 
-  {% if forecast_ok == false and warn_count == 0 %}
+{% if forecast_ok == false and warn_count == 0 %}
 
+  <div class="layout layout--col layout--center gap--small">
     <span class="value value--small">No forecast data</span>
-    <span class="label label--xsmall">MET Norway did not answer</span>
+    <span class="label label--small">MET Norway did not answer</span>
+  </div>
 
-  {% elsif warn_count > 0 %}
+{% else %}
 
-    <div class="flex flex--row flex--center-y gap--small bg--black px--2 py--1">
-      <span class="title title--small lg:title--base text--white text--uppercase">&#9888; {{ warn_level }}</span>
-    </div>
-    <span class="title title--medium lg:title--large text--center" data-clamp="2">{{ warn_event }}</span>
-    <span class="label label--small text--center" data-clamp="1">
-      {{ warn_area }}{% if warn_count > 1 %} &middot; +{{ warn_count | minus: 1 }} more{% endif %}
-    </span>
+  <div class="layout layout--col layout--center gap--small">
 
-  {% else %}
+    {% if warn_count > 0 %}
 
-    <div class="flex flex--row flex--center-y gap">
-      {% render "weather_icon", code: now_symbol, box: "w--[56px] h--[56px] lg:w--[88px] lg:h--[88px]" %}
-      <span class="value value--xlarge lg:value--xxlarge value--tnums" data-fit-value="true">{{ now_temp | round: 0 }}&deg;</span>
-    </div>
-    <span class="label label--small text--center" data-clamp="1">
-      Feels {{ now_feels | round: 0 }}&deg; &middot; {{ now_wind | round: 0 }} m/s {{ now_dir }}
-    </span>
-    {% if warnings_ok == false %}
-      <span class="label label--xsmall label--outline">Warnings unavailable</span>
+      {%- comment -%} The OG: the warning is the postcard. {%- endcomment -%}
+      <div class="flex flex--col flex--center-x flex--center-y gap--small lg:hidden">
+        <div class="flex flex--row flex--center-y gap--small bg--black px--2 py--1">
+          <span class="title title--small text--white">&#9888; {{ warn_level }}</span>
+        </div>
+        <span class="title title--base text--center" data-clamp="2">{{ warn_event }}</span>
+        <span class="label label--small text--center" data-clamp="1">
+          {{ warn_area }}{% if warn_count > 1 %} &middot; +{{ warn_count | minus: 1 }} more{% endif %}
+        </span>
+      </div>
+
+      {%- comment -%} The X: the warning is a band, and the forecast stays. The
+           area name goes, as on both halves: the band has one line. {%- endcomment -%}
+      <div class="hidden lg:flex flex--row flex--center-y gap--small bg--black px--2">
+        <span class="label label--small text--white">&#9888; {{ warn_level }}</span>
+        <span class="label label--small text--white" data-clamp="1">{{ warn_event }}</span>
+        {% if warn_count > 1 %}
+          <div class="grow"></div>
+          <span class="label label--small text--white">+{{ warn_count | minus: 1 }}</span>
+        {% endif %}
+      </div>
+
     {% endif %}
 
-  {% endif %}
+    {% if forecast_ok %}
 
-</div>
+      <div class="{{ forecast_show }} flex--col flex--center-x flex--center-y gap--small w--full">
+
+        {%- comment -%} Now. {%- endcomment -%}
+        <div class="flex flex--col flex--center-x gap--none">
+          <div class="flex flex--row flex--center-y gap">
+            {% render "weather_icon", code: now_symbol, box: "w--[56px] h--[56px] lg:w--[88px] lg:h--[88px]" %}
+            <span class="value value--xlarge lg:value--xxlarge value--tnums" data-fit-value="true">{{ now_temp | round: 0 }}&deg;</span>
+          </div>
+          <span class="label label--small text--center" data-clamp="1">
+            Feels {{ now_feels | round: 0 }}&deg; &middot; {{ now_wind | round: 0 }} m/s {{ now_dir }}
+          </span>
+        </div>
+
+        {%- comment -%} The X only: the next twelve hours. {%- endcomment -%}
+        <div class="divider divider--h hidden lg:block"></div>
+        <div class="hidden lg:grid grid--cols-6">
+          {% for record in hour_list %}
+            {% assign hour = record | split: "|" %}
+            <div class="flex flex--col flex--center-x gap--none">
+              <span class="label label--small">{{ hour[0] | times: 1 | date: "%H" }}</span>
+              {% render "weather_icon", code: hour[2], box: "w--[52px] h--[52px]" %}
+              <span class="value value--base lg:portrait:value--small value--tnums">{{ hour[1] }}&deg;</span>
+              <span class="label label--small">{% if hour[3] %}{{ hour[3] }}{{ hour[4] }}{% else %}&nbsp;{% endif %}</span>
+            </div>
+          {% endfor %}
+        </div>
+
+        {%- comment -%} The X in portrait only: the next four days. {%- endcomment -%}
+        <div class="divider divider--h hidden lg:portrait:block"></div>
+        <div class="hidden lg:portrait:grid grid--cols-4">
+          {% for record in day_list limit: 4 %}
+            {% assign day = record | split: "|" %}
+            <div class="flex flex--col flex--center-x gap--none">
+              <span class="label label--small">{% if forloop.first %}Today{% else %}{{ day[0] | times: 1 | date: "%a" }}{% endif %}</span>
+              {% render "weather_icon", code: day[3], box: "w--[52px] h--[52px]" %}
+              <span class="value value--base value--tnums">{{ day[1] | round: 0 }}&deg;</span>
+              <span class="label label--small">{{ day[2] | round: 0 }}&deg;</span>
+            </div>
+          {% endfor %}
+        </div>
+
+      </div>
+
+    {% else %}
+
+      {%- comment -%} A warning with no forecast behind it. The OG is showing the
+           warning and has no room to say more; the X has the space. {%- endcomment -%}
+      <span class="hidden lg:block label label--small">No forecast data</span>
+
+    {% endif %}
+
+    {% if warnings_ok == false %}
+      <span class="label label--small label--outline">Warnings unavailable</span>
+    {% endif %}
+
+  </div>
+
+{% endif %}
 
 <div class="title_bar">
   <img class="image image-stroke" src="data:image/svg+xml;base64,{{ svg_logo | base64_encode }}" />
