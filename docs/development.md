@@ -199,6 +199,45 @@ docker run --rm -v "$PWD:/plugin" trmnl/trmnlp lint
 exposure, while a push job would put the account key where every action in the
 workflow can read it.
 
+### After a review round, diff the live markup before you push
+
+The repo is the source of truth, but it is not the only way to write to the
+plugin. Anyone with access to the Recipe Master can edit the markup in the
+TRMNL browser editor, and **a TRMNL reviewer does exactly that**: they open the
+plugin, try a fix, and describe it in the review mail. That edit is live and it
+is in no commit. Push the repo over it and it is gone, with no warning and no
+conflict.
+
+So treat every review round as a two-way merge. Pull the live plugin into a
+throwaway copy, never into the repo, and diff:
+
+```sh
+live=$(mktemp -d)
+cp -R . "$live" && rm -f "$live/.env"
+TRMNL_API_KEY="$(op read "${TRMNL_API_KEY_REF:-op://TRMNL/API/credential}")" \
+  docker run --rm -e TRMNL_API_KEY -v "$live:/plugin" trmnl/trmnlp pull --force
+diff -ru src "$live/src"
+```
+
+`pull` takes the id from the `settings.yml` of the directory it is given, so
+the copy must be a copy of this project. Like `push`, it needs the account key,
+so **run it from your own terminal**: an agent's sandbox cannot read
+`~/.config/op`.
+
+Read the whole diff, not only the file the mail named. A reviewer describes one
+change; that is not proof they made only one.
+
+Two things the diff will show that are not real changes:
+
+- **`\r\n` line endings on the file they edited.** The browser editor writes
+  them, the repo uses `\n`, so the whole file reports as changed. `diff
+  --strip-trailing-cr` hides it. It is also the tell for *which* file was
+  edited by hand.
+- **Settings keys the repo does not have**, such as `map_tiles_url`. TRMNL adds
+  fields over time, and `push` rewrites `settings.yml` into the server's
+  canonical form anyway, so a push adds them to the file rather than dropping
+  them from the plugin.
+
 ### After publication, a push is a production change
 
 Today the plugin is private and a bad push costs nothing. Once the Recipe is
