@@ -87,7 +87,12 @@
             {% render "weather_icon", code: now_symbol, box: "w--[56px] h--[56px] lg:w--[88px] lg:h--[88px]" %}
             <span class="value value--xlarge lg:value--xxlarge value--tnums" data-fit-value="true">{{ now_temp | round: 0 }}&deg;</span>
           </div>
-          <span class="label label--small text--center" data-clamp="1">
+          {%- comment -%} Two lines on the X, one on the OG. The line carries a
+               feels-like, a wind speed and a compass point, and 400px fits that
+               on one line only while every part of it is short. `data-clamp-lg`
+               is the reviewer's own edit at acceptance; it is kept here so a
+               push does not undo it. {%- endcomment -%}
+          <span class="label label--small text--center" data-clamp="1" data-clamp-lg="2">
             Feels {{ now_feels | round: 0 }}&deg; &middot; {{ now_wind | round: 0 }} m/s {{ now_dir }}
           </span>
         </div>
