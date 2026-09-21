@@ -62,7 +62,7 @@
         <div class="flex flex--col flex--center-x gap--none">
           <span class="label label--small lg:label--base portrait:label--base">{% if forloop.first %}Today{% else %}{{ day[0] | times: 1 | date: "%a" }}{% endif %}</span>
           {% render "weather_icon", code: day[3], box: "w--[40px] h--[40px] lg:w--[60px] lg:h--[60px] portrait:w--[52px] portrait:h--[52px]" %}
-          <span class="value value--small lg:value--base lg:portrait:value--small value--tnums">{{ day[1] | round: 0 }}&deg; / {{ day[2] | round: 0 }}&deg;</span>
+          <span class="value value--small lg:value--base lg:portrait:value--small value--tnums" data-value-fit="true">{{ day[1] | round: 0 }}&deg;/{{ day[2] | round: 0 }}&deg;</span>
         </div>
       {% endfor %}
     </div>

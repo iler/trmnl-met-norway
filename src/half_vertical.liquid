@@ -73,7 +73,7 @@
           <span class="label label--small w--[56px] lg:w--[72px]">{% if forloop.first %}Today{% else %}{{ day[0] | times: 1 | date: "%a" }}{% endif %}</span>
           {% render "weather_icon", code: day[3], box: "w--[28px] h--[28px] lg:w--[40px] lg:h--[40px]" %}
           <div class="grow"></div>
-          <span class="value value--xsmall lg:value--small value--tnums">{{ day[1] | round: 0 }}&deg; / {{ day[2] | round: 0 }}&deg;</span>
+          <span class="value value--xsmall lg:value--small value--tnums">{{ day[1] | round: 0 }}&deg;/{{ day[2] | round: 0 }}&deg;</span>
         </div>
       {% endfor %}
     </div>
